@@ -21,7 +21,7 @@ build: |
   tmpdir=`mktemp -d /tmp/lib_XXXXXXXXXXXXXXXX_webkit2gtk-4.1`
   sed -i -b "s|/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1|$tmpdir|g" $PREFIX/lib/x86_64-linux-gnu/libwebkit2gtk-4.1.so.0
 
-  # 启动脚本将 /opt 下面的 webkit2gtk-4.1 复制到 /tmp 目录，并启动应用
+  # 启动脚本将 /opt 下面的 webkit2gtk-4.1 链接到 /tmp 目录，并启动应用
   startScript="$PREFIX/bin/start-tauri-app"
   echo "#!/bin/sh" > $startScript
   echo "rm -r $tmpdir" >> $startScript
