@@ -16,15 +16,16 @@ build: |
   bash ./install_dep linglong/sources $PREFIX
   # 复制可执行文件，需要先执行yarn tauri build
   cp src-tauri/target/release/bundle/deb/tauri-app_0.1.0_amd64/data/usr/bin/tauri-app $PREFIX/bin
-  # 替换so中的硬编码路径，将 x86_64-linux-gnu/ 替换成 XXXXXXXXXXXXXXXX_ 以保持路径字符串的长度不变并且不会在多个应用之间冲突
-  tmpdir=`mktemp -d /tmp/lib/XXXXXXXXXXXXXXXX_webkit2gtk-4.1`
+  # 替换so中的硬编码路径，将 /x86_64-linux-gnu/ 替换成 _XXXXXXXXXXXXXXXX_ 可以保持路径字符串的长度不变并且不会在多个应用之间冲突
+  # mktemp 会将X替换成随机字符
+  tmpdir=`mktemp -d /tmp/lib_XXXXXXXXXXXXXXXX_webkit2gtk-4.1`
   sed -i -b "s|/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1|$tmpdir|g" $PREFIX/lib/x86_64-linux-gnu/libwebkit2gtk-4.1.so.0
 
   # 启动脚本将 /opt 下面的 webkit2gtk-4.1 复制到 /tmp 目录，并启动应用
   startScript="$PREFIX/bin/start-tauri-app"
   echo "#!/bin/sh" > $startScript
-  echo "mkdir $tmpdir" >> $startScript
-  echo "cp -r $PREFIX/lib/x86_64-linux-gnu/webkit2gtk-4.1/* $tmpdir/" >> $startScript
+  echo "rm -r $tmpdir" >> $startScript
+  echo "ln -s $PREFIX/lib/x86_64-linux-gnu/webkit2gtk-4.1 $tmpdir" >> $startScript
   echo "tauri-app" >> $startScript
   chmod +x $startScript
 
